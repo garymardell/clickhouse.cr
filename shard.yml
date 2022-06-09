@@ -1,0 +1,14 @@
+name: clickhouse
+version: 0.1.0
+
+authors:
+  - Gary Mardell <info@garymardell.co.uk>
+
+crystal: ">= 1.0.0, < 2.0.0"
+
+license: MIT
+
+dependencies:
+  db:
+    github: crystal-lang/crystal-db
+    version: ~> 0.11.0
