@@ -1,24 +1,49 @@
+require "uuid"
+
 module Clickhouse
   class Statement < ::DB::Statement
     protected def conn
-      connection.as(Connection).connection
+      connection.as(Connection)
     end
 
     protected def perform_query(args : Enumerable) : ResultSet
       conn = self.conn
+      conn.buffer.write_uint64(Protocol::ClientQuery)
 
-      headers = HTTP::Headers.new
-      headers["X-ClickHouse-Format"] = "CSVWithNamesAndTypes"
+      settings = [
+        Protocol::Setting.new("max_execution_time", 60)
+      ]
+      parameters = [] of Protocol::Parameter
 
-      bound_command = bind(command, args)
+      query = Protocol::Query.new(
+        id: UUID.random.to_s,
+        client_name: conn.client.name,
+        client_version: Protocol::Version.new(
+          major: Protocol::ClientVersionMajor,
+          minor: Protocol::ClientVersionMinor,
+          patch: Protocol::ClientVersionPatch
+        ),
+        client_tcp_protocol_version: Protocol::ClientTCPProtocolVersion,
+        body: command,
+        quota_key: "",
+        compression: false, # TODO: Support compression,
+        initial_user: "",
+        initial_address: conn.socket.local_address.to_s,
+        settings: settings,
+        parameters: parameters
+      )
 
-      response = conn.post(path: "/", body: bound_command, headers: headers)
+      query.encode(conn.buffer, conn.server.revision)
 
-      unless response.status == HTTP::Status::OK
-        raise ::DB::Error.new(response.body)
+      send_data(conn, Protocol::Block.new, "")
+      conn.flush
+
+      case conn.reader.read_byte
+      when Protocol::ServerException
+        pp Protocol::Exception.decode(conn.reader)
       end
 
-      ResultSet.new(self, response)
+      raise "Query failed"
     rescue IO::Error
       raise DB::ConnectionLost.new(connection)
     end
@@ -35,16 +60,15 @@ module Clickhouse
       raise DB::ConnectionLost.new(connection)
     end
 
-    private def bind(command, args)
-      # "INSERT INTO micrate_db_version (version_id, is_applied) VALUES (?, ?);
-      regex = /[?]/
+    private def send_data(conn : Connection, block : Protocol::Block, name : String)
+      conn.buffer.write_uint64(Protocol::ClientData)
+      conn.buffer.write_string(name)
 
-      index = 0
-      command.gsub(pattern: /[?]/) do |_|
-        value = format(args[index])
-        index += 1
-        value
-      end
+      block.encode_header(conn.buffer, conn.client.revision)
+
+      # TODO: Compression
+
+      # conn.flush
     end
 
     private def format(arg)

@@ -1,6 +1,6 @@
 module Clickhouse
   module Message
-    abstract def encode(encoder : Encoder)
+    abstract def encode(buffer : Buffer)
   end
 end
 

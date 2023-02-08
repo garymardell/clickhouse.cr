@@ -13,7 +13,7 @@ module Clickhouse
       def initialize(@rows, @bytes, @total_rows, @wrote_rows, @wrote_bytes, @with_client)
       end
 
-      def encode(encoder : Encoder)
+      def encode(buffer : Buffer)
       end
     end
   end

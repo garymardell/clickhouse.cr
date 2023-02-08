@@ -9,7 +9,7 @@ module Clickhouse
       def initialize(@first, @second)
       end
 
-      def encode(encoder : Encoder)
+      def encode(buffer : Buffer)
       end
     end
   end
