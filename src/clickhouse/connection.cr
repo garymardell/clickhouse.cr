@@ -64,7 +64,6 @@ module Clickhouse
 
         if Protocol::ClientTCPProtocolVersion >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM
           if @client.revision >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_QUOTA_KEY
-            # c.buffer.PutString("") # todo quota key support
             @buffer.write_string("")
           end
         end
