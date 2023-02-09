@@ -3,25 +3,6 @@ require "http/client"
 
 module Clickhouse
   class Connection < ::DB::Connection
-    DBMS_MIN_REVISION_WITH_CLIENT_INFO                        = 54032
-    DBMS_MIN_REVISION_WITH_SERVER_TIMEZONE                    = 54058
-    DBMS_MIN_REVISION_WITH_QUOTA_KEY_IN_CLIENT_INFO           = 54060
-    DBMS_MIN_REVISION_WITH_SERVER_DISPLAY_NAME                = 54372
-    DBMS_MIN_REVISION_WITH_VERSION_PATCH                      = 54401
-    DBMS_MIN_REVISION_WITH_CLIENT_WRITE_INFO                  = 54420
-    DBMS_MIN_REVISION_WITH_SETTINGS_SERIALIZED_AS_STRINGS     = 54429
-    DBMS_MIN_REVISION_WITH_INTERSERVER_SECRET                 = 54441
-    DBMS_MIN_REVISION_WITH_OPENTELEMETRY                      = 54442
-    DBMS_MIN_PROTOCOL_VERSION_WITH_DISTRIBUTED_DEPTH          = 54448
-    DBMS_MIN_PROTOCOL_VERSION_WITH_INITIAL_QUERY_START_TIME   = 54449
-    DBMS_MIN_PROTOCOL_VERSION_WITH_INCREMENTAL_PROFILE_EVENTS = 54451
-    DBMS_MIN_REVISION_WITH_PARALLEL_REPLICAS                  = 54453
-    DBMS_MIN_REVISION_WITH_CUSTOM_SERIALIZATION               = 54454
-    DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM                   = 54458
-    DBMS_MIN_PROTOCOL_VERSION_WITH_QUOTA_KEY                  = 54458
-    DBMS_MIN_PROTOCOL_VERSION_WITH_PARAMETERS                 = 54459
-    DBMS_TCP_PROTOCOL_VERSION                                 = DBMS_MIN_PROTOCOL_VERSION_WITH_PARAMETERS.to_u64
-
     protected getter socket : TCPSocket
 
     property buffer : Buffer
@@ -36,10 +17,9 @@ module Clickhouse
       port = context.uri.port || 9000
 
       @socket = TCPSocket.new(host, port)
-      # @socket.sync = false
-
       @reader = Reader.new(@socket)
       @buffer = Buffer.new
+
       @buffer.write_uint64(Protocol::ClientHello)
 
       @client = Protocol::ClientHandshake.new("Rawr", 54459u64)
@@ -62,8 +42,8 @@ module Clickhouse
         puts "Server said hello"
         @server = Protocol::ServerHandshake.decode(@reader)
 
-        if Protocol::ClientTCPProtocolVersion >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM
-          if @client.revision >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_QUOTA_KEY
+        if Protocol::ClientTCPProtocolVersion >= DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM
+          if @client.revision >= DBMS_MIN_PROTOCOL_VERSION_WITH_QUOTA_KEY
             @buffer.write_string("")
           end
         end
@@ -95,32 +75,10 @@ module Clickhouse
         return
       end
 
-      puts "written to socket"
-      # puts buffer.to_slice.join(" ")
-      puts buffer.to_slice
-
-      # IO.copy buffer, socket, buffer.size
       socket.write(buffer.to_slice)
       socket.flush
 
       buffer.reset
-    end
-
-    def send_query(body : String)
-      # c.buffer.PutByte(proto.ClientQuery)
-
-      query = Protocol::Query.new(
-        id: "",
-        body: body,
-        quota_key: "",
-        compression: false,
-        initial_user: "",
-        initial_address: "",
-      )
-
-      query.encode(@buffer)
-
-      flush
     end
 
     def build_prepared_statement(query) : Statement

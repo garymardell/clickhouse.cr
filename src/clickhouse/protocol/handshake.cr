@@ -5,7 +5,7 @@ module Clickhouse
     ClientVersionMajor       = 2_u8
     ClientVersionMinor       = 5_u8
     ClientVersionPatch       = 0_u8
-    ClientTCPProtocolVersion = Connection::DBMS_TCP_PROTOCOL_VERSION
+    ClientTCPProtocolVersion = DBMS_TCP_PROTOCOL_VERSION
 
     struct Version
       include Message
@@ -61,7 +61,7 @@ module Clickhouse
         minor = reader.read_uint64.not_nil!
         revision = reader.read_uint64.not_nil!
 
-        timezone = if revision >= Connection::DBMS_MIN_REVISION_WITH_SERVER_TIMEZONE
+        timezone = if revision >= DBMS_MIN_REVISION_WITH_SERVER_TIMEZONE
           timezone_name = reader.read_string.not_nil!
 
           Time::Location.load(timezone_name)
@@ -69,11 +69,11 @@ module Clickhouse
           Time::Location.local
         end
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_SERVER_DISPLAY_NAME
+        if revision >= DBMS_MIN_REVISION_WITH_SERVER_DISPLAY_NAME
           display_name = reader.read_string
         end
 
-        patch = if revision >= Connection::DBMS_MIN_REVISION_WITH_VERSION_PATCH
+        patch = if revision >= DBMS_MIN_REVISION_WITH_VERSION_PATCH
           reader.read_uint64.not_nil!
         else
           revision

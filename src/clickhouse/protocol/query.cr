@@ -40,7 +40,7 @@ module Clickhouse
         # Encode settings information
         encode_settings(buffer, revision)
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_INTERSERVER_SECRET
+        if revision >= DBMS_MIN_REVISION_WITH_INTERSERVER_SECRET
           buffer.write_string("")
         end
 
@@ -48,7 +48,7 @@ module Clickhouse
         buffer.write_bool(false) # TODO: Update to allow compression
         buffer.write_string(body)
 
-        if revision >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_PARAMETERS
+        if revision >= DBMS_MIN_PROTOCOL_VERSION_WITH_PARAMETERS
           encode_parameters(buffer, revision)
         end
       end
@@ -59,7 +59,7 @@ module Clickhouse
         buffer.write_string("") # initial_query_id
         buffer.write_string(initial_address)
 
-        if revision >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_INITIAL_QUERY_START_TIME
+        if revision >= DBMS_MIN_PROTOCOL_VERSION_WITH_INITIAL_QUERY_START_TIME
           buffer.write_sfixed64(0) # initial_query_start_time_microseconds
         end
 
@@ -72,24 +72,24 @@ module Clickhouse
         buffer.write_uint64(client_tcp_protocol_version)
         # buffer.write_uint64(0_u64)
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_QUOTA_KEY_IN_CLIENT_INFO
+        if revision >= DBMS_MIN_REVISION_WITH_QUOTA_KEY_IN_CLIENT_INFO
           buffer.write_string(quota_key)
         end
 
-        if revision >= Connection::DBMS_MIN_PROTOCOL_VERSION_WITH_DISTRIBUTED_DEPTH
+        if revision >= DBMS_MIN_PROTOCOL_VERSION_WITH_DISTRIBUTED_DEPTH
           buffer.write_uint64(0_u64)
         end
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_VERSION_PATCH
+        if revision >= DBMS_MIN_REVISION_WITH_VERSION_PATCH
           buffer.write_uint64(0_u64)
         end
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_OPENTELEMETRY
+        if revision >= DBMS_MIN_REVISION_WITH_OPENTELEMETRY
           # TODO: Pass any opentelemetry span info
           buffer.write_byte(0_u8)
         end
 
-        if revision >= Connection::DBMS_MIN_REVISION_WITH_PARALLEL_REPLICAS
+        if revision >= DBMS_MIN_REVISION_WITH_PARALLEL_REPLICAS
           buffer.write_uint64(0_u64) # collaborate_with_initiator
           buffer.write_uint64(0_u64) # count_participating_replicas
           buffer.write_uint64(0_u64) # number_of_current_replica
