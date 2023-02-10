@@ -40,7 +40,7 @@ module Clickhouse
 
       case conn.reader.read_byte
       when Protocol::ServerException
-        pp Protocol::Exception.decode(conn.reader)
+        raise ServerError.new(Protocol::Exception.decode(conn.reader))
       end
 
       raise "Query failed"

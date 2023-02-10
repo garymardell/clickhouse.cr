@@ -36,8 +36,7 @@ module Clickhouse
       case packet
       when Protocol::ServerException
         puts "Server exception"
-        # TODO: Read exception error and format an exception
-        raise "server exception"
+        raise ServerError.new(Protocol::Exception.decode(@reader))
       when Protocol::ServerHello
         puts "Server said hello"
         @server = Protocol::ServerHandshake.decode(@reader)
