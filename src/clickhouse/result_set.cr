@@ -2,19 +2,13 @@ require "csv"
 
 module Clickhouse
   class ResultSet < ::DB::ResultSet
-    def initialize(statement, @response : HTTP::Client::Response)
+    # Currently this is eager loading the whole block, rather than on demand for rows.
+    def initialize(statement, @block : Protocol::Block?)
       super(statement)
 
-      @csv = CSV.new(@response.body, headers: true)
-      @types = [] of String
-
-      begin
-        @csv.next
-        @types = @csv.row
-      rescue CSV::Error
-      end
-
       @column_index = -1
+      @end = false
+      @rows_affected = 0_i64
     end
 
     protected def conn
@@ -22,27 +16,27 @@ module Clickhouse
     end
 
     def move_next : Bool
-      @column = -1
-      @csv.next
+     false
     end
 
     def column_count : Int32
-      @csv.headers.size
+      0
     end
 
     def column_name(index : Int32) : String
-      @csv.headers[index]
+      ""
     end
 
     def read
-      @column_index += 1
+      # @column_index += 1
 
-      decoder = Decoders.for_name(@types[@column_index])
-      decoder.decode(@csv.row[@column_index])
+      # decoder = Decoders.for_name(@types[@column_index])
+      # decoder.decode(@csv.row[@column_index])
+      ""
     end
 
     def next_column_index : Int32
-      @column_index
+      1
     end
   end
 end

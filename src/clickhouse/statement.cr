@@ -38,12 +38,27 @@ module Clickhouse
       send_data(conn, Protocol::Block.new, "")
       conn.flush
 
-      case conn.reader.read_byte
+      packet = conn.reader.read_byte
+
+      case packet
+      when Protocol::ServerEndOfStream
+        ResultSet.new(self, nil) # TODO: Indicate that this is empty result set
+      when Protocol::ServerData, Protocol::ServerTotals, Protocol::ServerExtremes
+        conn.reader.read_string
+
+        block = Protocol::Block.decode(
+          conn.reader,
+          conn.client.revision,
+          packet.not_nil!,
+          conn.server.timezone
+        )
+
+        ResultSet.new(self, block)
       when Protocol::ServerException
         raise ServerError.new(Protocol::Exception.decode(conn.reader))
+      else
+        raise Error.new("Unsupported packet #{packet}")
       end
-
-      raise "Query failed"
     rescue IO::Error
       raise DB::ConnectionLost.new(connection)
     end
