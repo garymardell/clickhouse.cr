@@ -3,8 +3,10 @@ require "csv"
 module Clickhouse
   class ResultSet < ::DB::ResultSet
     # Currently this is eager loading the whole block, rather than on demand for rows.
-    def initialize(statement, @block : Protocol::Block?)
+    def initialize(statement, response)
       super(statement)
+
+      @parsed = CSV.parse(response.body, '\t')
 
       @column_index = -1
       @end = false
@@ -20,7 +22,7 @@ module Clickhouse
     end
 
     def column_count : Int32
-      0
+      @parsed.rows[0].try &.size || 0
     end
 
     def column_name(index : Int32) : String

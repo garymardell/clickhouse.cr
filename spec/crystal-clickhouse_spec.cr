@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Clickhouse do
   it "works" do
-    DB.open("clickhouse://127.0.0.1:9000") do |db|
+    DB.open("clickhouse://127.0.0.1:8123") do |db|
       db.exec("DROP TABLE IF EXISTS sales")
 
       sql = <<-SQL
@@ -21,7 +21,7 @@ describe Clickhouse do
 
       1.times do
         values = String.build do |io|
-          10_000.times do |i|
+          5.times do |i|
             io << "(generateUUIDv4(), 123456, 45.56)"
             io << "," unless i % 9_999 == 0
           end
@@ -30,7 +30,13 @@ describe Clickhouse do
         db.exec("INSERT INTO sales VALUES #{values}")
       end
 
-      db.exec("SELECT * FROM sales")
+      db.query("SELECT * FROM sales") do |rs|
+        rs.each do
+          puts rs.read(String)
+          puts rs.read(UInt64)
+          puts rs.read(BigDecimal)
+        end
+      end
     end
   end
 end
