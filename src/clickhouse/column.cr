@@ -1,5 +1,19 @@
 module Clickhouse
   abstract class Column
+    getter name : String
+    getter timezone : Time::Location
+
+    def initialize(@name : String, @timezone : Time::Location)
+    end
+
+    abstract def decode(reader : Reader, rows : Uint64)
+
+    def self.for_type(type : String)
+      case type
+      when "String"
+        Columns::StringColumn
+      end
+    end
   end
 end
 

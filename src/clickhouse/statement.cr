@@ -53,7 +53,16 @@ module Clickhouse
           conn.server.timezone
         )
 
+        pp block
+
         ResultSet.new(self, block)
+      when Protocol::ServerProfileEvents
+        ResultSet.new(self, nil)
+      when Protocol::ServerProgress
+        progress = Protocol::Progress.decode(conn.reader, conn.client.revision)
+
+        # TODO: Do something with the progress? How does this fit with ResultSet.. no idea.
+        ResultSet.new(self, nil)
       when Protocol::ServerException
         raise ServerError.new(Protocol::Exception.decode(conn.reader))
       else

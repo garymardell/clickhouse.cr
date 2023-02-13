@@ -53,6 +53,14 @@ module Clickhouse
           name = reader.read_string.not_nil!
           type = reader.read_string.not_nil!
 
+          column_class = Column.for_type(type)
+
+          unless column_class
+            raise Error.new("unsupported column type #{type}")
+          end
+
+          column = column_class.new(name, timezone)
+
           if revision >= DBMS_MIN_REVISION_WITH_CUSTOM_SERIALIZATION
             if has_custom = reader.read_bool.not_nil!
               raise Error.new("custom serialization for column #{name}. not supported")
@@ -60,11 +68,15 @@ module Clickhouse
           end
 
           if rows != 0
-            # TODO: Decode stuff
-          end
+            if column.is_a?(CustomSerialization)
+              column.read_state_prefix(reader)
+            end
 
-          names << name
-          columns << Columns::String.new
+            column.decode(reader, rows)
+
+            names << name
+            columns << column
+          end
         end
 
         new(names, packet, columns, timezone)

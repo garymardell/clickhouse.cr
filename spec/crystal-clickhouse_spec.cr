@@ -29,6 +29,8 @@ describe Clickhouse do
 
         db.exec("INSERT INTO sales VALUES #{values}")
       end
+
+      db.exec("SELECT * FROM sales")
     end
   end
 end
