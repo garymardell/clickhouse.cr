@@ -1,10 +1,15 @@
 require "big"
+require "json"
 
 module Clickhouse
   module Decoders
     module Decoder
       abstract def decode(value)
       abstract def names : Array(String)
+
+      def decode(value)
+        raise "Failed to decode value"
+      end
 
       macro def_names(names)
         NAMES = {{names}}
@@ -20,7 +25,7 @@ module Clickhouse
 
       def_names ["Int8", "TINYINT", "INT1"] # "BOOL", "BOOLEAN"
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_i8
       end
     end
@@ -30,7 +35,7 @@ module Clickhouse
 
       def_names ["Int16", "SMALLINT", "INT2"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_i16
       end
     end
@@ -40,7 +45,7 @@ module Clickhouse
 
       def_names ["Int32", "INT4", "INTEGER"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_i32
       end
     end
@@ -50,7 +55,7 @@ module Clickhouse
 
       def_names ["Int64", "BIGINT"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_i64
       end
     end
@@ -60,7 +65,7 @@ module Clickhouse
 
       def_names ["Int128"]
 
-      def decode(value)
+      def decode(value : String)
         value.to_i128
       end
     end
@@ -70,7 +75,7 @@ module Clickhouse
 
       def_names ["Int256"]
 
-      def decode(value)
+      def decode(value : String)
         BigInt.new(value)
       end
     end
@@ -80,7 +85,7 @@ module Clickhouse
 
       def_names ["UInt8"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_u8
       end
     end
@@ -90,7 +95,7 @@ module Clickhouse
 
       def_names ["UInt16"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_u16
       end
     end
@@ -100,7 +105,7 @@ module Clickhouse
 
       def_names ["UInt32"]
 
-      def decode(value)
+      def decode(value : Int64)
         value.to_u32
       end
     end
@@ -110,7 +115,7 @@ module Clickhouse
 
       def_names ["UInt64"]
 
-      def decode(value)
+      def decode(value : String)
         value.to_u64
       end
     end
@@ -120,7 +125,7 @@ module Clickhouse
 
       def_names ["UInt128"]
 
-      def decode(value)
+      def decode(value : String)
         value.to_u128
       end
     end
@@ -130,7 +135,7 @@ module Clickhouse
 
       def_names ["UInt256"]
 
-      def decode(value)
+      def decode(value : String)
         BigInt.new(value)
       end
     end
@@ -140,7 +145,7 @@ module Clickhouse
 
       def_names ["Float32", "FLOAT"]
 
-      def decode(value)
+      def decode(value : Float64)
         value.to_f32
       end
     end
@@ -150,7 +155,7 @@ module Clickhouse
 
       def_names ["Float64", "DOUBLE"]
 
-      def decode(value)
+      def decode(value : Float64)
         value.to_f64
       end
     end
@@ -160,7 +165,7 @@ module Clickhouse
 
       def_names ["Bool"]
 
-      def decode(value)
+      def decode(value : String)
         case value
         when "true"
           true
@@ -175,7 +180,7 @@ module Clickhouse
     struct StringDecoder
       include Decoder
 
-      def_names ["String", "LONGTEXT", "MEDIUMTEXT", "TINYTEXT", "TEXT", "LONGBLOB", "MEDIUMBLOB", "TINYBLOB", "BLOB", "VARCHAR", "CHAR"]
+      def_names ["String", "LONGTEXT", "MEDIUMTEXT", "TINYTEXT", "TEXT", "LONGBLOB", "MEDIUMBLOB", "TINYBLOB", "BLOB", "VARCHAR", "CHAR", "FixedString"]
 
       def decode(value)
         value.to_s
@@ -187,8 +192,20 @@ module Clickhouse
 
       def_names ["DateTime"]
 
-      def decode(value)
+      def decode(value : String)
         Time.parse(value, "%Y-%m-%d %H:%M:%S", Time::Location::UTC)
+      end
+    end
+
+    struct MapDecoder
+      include Decoder
+
+      def_names ["Map(String, String)"]
+
+      def decode(value)
+        JSON::Any.new(value).as_h.transform_values do |value|
+          value.to_s
+        end
       end
     end
 
@@ -221,5 +238,6 @@ module Clickhouse
     register_decoder BoolDecoder.new
     register_decoder StringDecoder.new
     register_decoder DateTimeDecoder.new
+    register_decoder MapDecoder.new
   end
 end

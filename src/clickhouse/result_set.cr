@@ -1,13 +1,23 @@
 require "csv"
+require "json"
 
 module Clickhouse
   class ResultSet < ::DB::ResultSet
+    property rows : Array(Array(JSON::Any::Type))
+
     # Currently this is eager loading the whole block, rather than on demand for rows.
     def initialize(statement, response)
       super(statement)
 
-      @parsed = CSV.parse(response.body, '\t')
+      @rows = response.body.split("\n").reduce([] of Array(JSON::Any::Type)) do |memo, compact|
+        memo << Array(JSON::Any::Type).from_json(compact) unless compact.blank?
+        memo
+      end
 
+      @columns = @rows.shift
+      @types = @rows.shift
+
+      @row = -1
       @column_index = -1
       @end = false
       @rows_affected = 0_i64
@@ -18,27 +28,37 @@ module Clickhouse
     end
 
     def move_next : Bool
-     false
+      if @column_index <= column_count - 1
+        @column_index = -1
+      end
+
+      if @row + 1 < @rows.size
+        @row += 1
+        true
+      else
+        false
+      end
     end
 
     def column_count : Int32
-      @parsed.rows[0].try &.size || 0
+      @columns.size
     end
 
     def column_name(index : Int32) : String
-      ""
+      @columns[index].to_s
     end
 
     def read
-      # @column_index += 1
+      @column_index += 1
 
-      # decoder = Decoders.for_name(@types[@column_index])
-      # decoder.decode(@csv.row[@column_index])
-      ""
+      type = @types[@column_index].to_s
+
+      decoder = Decoders.for_name(type.partition(/\(\d+\)/)[0])
+      decoder.decode(@rows[@row][@column_index])
     end
 
     def next_column_index : Int32
-      1
+      @column_index
     end
   end
 end

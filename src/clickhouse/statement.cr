@@ -14,7 +14,10 @@ module Clickhouse
         form.add "query", command
       end
 
-      response = conn.http.post("/?#{params}")
+      headers = HTTP::Headers.new
+      headers["X-Clickhouse-Format"] = "JSONCompactEachRowWithNamesAndTypes"
+
+      response = conn.http.post("/?#{params}", headers)
 
       case response.status_code
       when 200
