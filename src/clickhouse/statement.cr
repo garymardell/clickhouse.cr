@@ -16,7 +16,12 @@ module Clickhouse
 
       response = conn.http.post("/?#{params}")
 
-      ResultSet.new(self, response)
+      case response.status_code
+      when 200
+        ResultSet.new(self, response)
+      else
+        raise Error.new("Error occurred")
+      end
     rescue IO::Error
       raise DB::ConnectionLost.new(connection)
     end
