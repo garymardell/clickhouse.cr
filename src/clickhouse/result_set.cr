@@ -4,6 +4,8 @@ require "json"
 module Clickhouse
   class ResultSet < ::DB::ResultSet
     property rows : Array(Array(JSON::Any::Type))
+    property columns : Array(String) = [] of String
+    property types : Array(String) = [] of String
 
     # Currently this is eager loading the whole block, rather than on demand for rows.
     def initialize(statement, response)
@@ -14,8 +16,10 @@ module Clickhouse
         memo
       end
 
-      @columns = @rows.shift
-      @types = @rows.shift
+      if @rows.size > 0
+        @columns = @rows.shift.map(&.to_s)
+        @types = @rows.shift.map(&.to_s)
+      end
 
       @row = -1
       @column_index = -1
