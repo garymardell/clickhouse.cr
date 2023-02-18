@@ -12,6 +12,7 @@ module Clickhouse
       uri.scheme = context.uri.scheme == "clickhouse" ? "http" : "https"
 
       @http = HTTP::Client.new(uri)
+      @http.basic_auth(uri.user, uri.password) if uri.user && uri.password
     end
 
     def build_prepared_statement(query) : Statement
