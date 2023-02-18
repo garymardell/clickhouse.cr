@@ -23,7 +23,7 @@ module Clickhouse
       when 200
         ResultSet.new(self, response)
       else
-        raise Error.new("Error occurred")
+        raise Error.new(response.body)
       end
     rescue IO::Error
       raise DB::ConnectionLost.new(connection)
