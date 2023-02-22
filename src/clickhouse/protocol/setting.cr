@@ -1,3 +1,5 @@
+require "big"
+
 module Clickhouse
   module Protocol
     struct Setting

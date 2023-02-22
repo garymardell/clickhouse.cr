@@ -57,8 +57,7 @@ module Clickhouse
 
       type = @types[@column_index].to_s
 
-      decoder = Decoders.for_name(type.partition(/\(\d+\)/)[0])
-      decoder.decode(@rows[@row][@column_index])
+      @rows[@row][@column_index]
     end
 
     def next_column_index : Int32
