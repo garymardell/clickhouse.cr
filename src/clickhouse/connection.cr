@@ -1,4 +1,3 @@
-require "socket"
 require "http/client"
 
 module Clickhouse
@@ -8,11 +7,10 @@ module Clickhouse
     def initialize(context)
       super(context)
 
-      uri = context.uri
+      uri = context.uri.dup
       uri.scheme = context.uri.scheme == "clickhouse" ? "http" : "https"
 
-      @http = HTTP::Client.new(uri)
-      @http.basic_auth(uri.user, uri.password) if uri.user && uri.password
+      @http = build_http(uri)
     end
 
     def build_prepared_statement(query) : Statement
@@ -33,6 +31,12 @@ module Clickhouse
       begin
         @http.close
       rescue
+      end
+    end
+
+    private def build_http(uri)
+      HTTP::Client.new(uri).tap do |http|
+        http.basic_auth(uri.user, uri.password) if uri.user && uri.password
       end
     end
   end
