@@ -16,6 +16,7 @@ module Clickhouse
 
       headers = HTTP::Headers.new
       headers["X-Clickhouse-Format"] = "JSONCompactEachRowWithNamesAndTypes"
+      headers["Keep-Alive"] = "timeout=5, max=1000"
 
       response = conn.http.post("/?#{params}", headers)
 
