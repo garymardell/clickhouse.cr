@@ -1,42 +1,61 @@
-require "csv"
-
 module Clickhouse
   class ResultSet < ::DB::ResultSet
-    # Currently this is eager loading the whole block, rather than on demand for rows.
-    def initialize(statement, @block : Protocol::Block?)
+    def initialize(statement : Statement, @blocks : Array(Clickhoused::Packets::Data))
       super(statement)
 
-      @column_index = -1
-      @end = false
-      @rows_affected = 0_i64
-    end
+      @block_index = 0
+      @block_row_index = -1
 
-    protected def conn
-      statement.as(Statement).conn
+      @row_index = -1
+      @column_index = -1
     end
 
     def move_next : Bool
-     false
+      if @row_index < rows - 1
+        @row_index += 1
+        @block_row_index += 1
+        @column_index = -1
+
+        if @block_row_index >= current_block.rows
+          move_to_next_block
+        end
+
+        true
+      else
+        false
+      end
+    end
+
+    private def current_block
+      @blocks[@block_index]
+    end
+
+    private def move_to_next_block
+      @block_index += 1
+      @block_row_index = -1
+    end
+
+    private def rows
+      @blocks.sum(&.rows)
     end
 
     def column_count : Int32
-      0
+      current_block.columns.size || 0
     end
 
     def column_name(index : Int32) : String
-      ""
+      column = current_block.columns[@column_index]
+      column.name
     end
 
     def read
-      # @column_index += 1
-
-      # decoder = Decoders.for_name(@types[@column_index])
-      # decoder.decode(@csv.row[@column_index])
-      ""
+      column = current_block.columns[@column_index]
+      column.get(@block_row_index)
     end
 
     def next_column_index : Int32
-      1
+      @column_index += 1 if @column_index < column_count
+      @column_index
     end
   end
 end

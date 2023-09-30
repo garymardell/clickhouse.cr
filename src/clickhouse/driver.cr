@@ -7,4 +7,3 @@ module Clickhouse
 end
 
 DB.register_driver "clickhouse", Clickhouse::Driver
-DB.register_driver "clickhouses", Clickhouse::Driver

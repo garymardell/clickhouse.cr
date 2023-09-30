@@ -4,7 +4,7 @@ services:
   clickhouse:
     networks:
       - clickhouse
-    container_name: clickhouse
+    container_name: clickhouse-testing
     image: bitnami/clickhouse:latest
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
