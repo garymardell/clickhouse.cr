@@ -70,7 +70,7 @@ module Clickhoused
       when /^Enum8/
         Columns::Enum8Column
       when /^Array/
-        ArrayColumn
+        Columns::ArrayColumn
       end
     end
   end

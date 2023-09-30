@@ -1,18 +1,15 @@
 require "../server_packet"
 require "../column"
-require "../array_column"
 
 module Clickhoused
   module Packets
-    alias ColumnType = Column | ArrayColumn
-
     class Block < ServerPacket
       property names : Array(String)
       property packet : UInt8?
-      property columns : Array(ColumnType)
+      property columns : Array(Column)
       property timezone : Time::Location?
 
-      def initialize(@names = [] of String, @packet = nil, @columns = [] of ColumnType, @timezone = nil)
+      def initialize(@names = [] of String, @packet = nil, @columns = [] of Column, @timezone = nil)
       end
 
       def encode(writer : Writer, revision : UInt64)
@@ -67,7 +64,7 @@ module Clickhoused
         end
 
         names = [] of String
-        columns = [] of ColumnType
+        columns = [] of Column
 
         cols.times do
           name = reader.read_string.not_nil!
