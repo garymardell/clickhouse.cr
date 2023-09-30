@@ -13,7 +13,6 @@ module Clickhouse
       until packet.is_a?(Clickhoused::Packets::EndOfStream) || packet.is_a?(Clickhoused::Packets::Exception)
         packet = conn.connection.read_packet
 
-
         case packet
         when Clickhoused::Packets::Data
           blocks << packet if packet.rows > 0 # Skip the empty data blocks

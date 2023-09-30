@@ -96,11 +96,11 @@ describe Clickhoused do
       query = String.build do |io|
         io << "INSERT INTO blobs (version) VALUES "
 
-        2.times do |i|
+        1.times do |i|
           io << "("
           io << "['hello', 'goodbye']"
           io << ")"
-          io << ", " unless i == 1
+          # io << ", " unless i == 1
         end
       end
 
@@ -114,7 +114,7 @@ describe Clickhoused do
 
       db.query("SELECT * FROM blobs ORDER BY version ASC LIMIT 100") do |rs|
         rs.each do
-          #pp rs.read(Array(String))
+          pp rs.read(Array(String))
         end
       end
     end

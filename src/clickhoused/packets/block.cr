@@ -1,10 +1,10 @@
 require "../server_packet"
 require "../column"
-# require "../array_column"
+require "../array_column"
 
 module Clickhoused
   module Packets
-    alias ColumnType = Column # | ArrayColumn(Types)
+    alias ColumnType = Column | ArrayColumn
 
     class Block < ServerPacket
       property names : Array(String)

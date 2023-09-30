@@ -65,12 +65,12 @@ module Clickhoused
         Columns::DateTimeColumn
       when "UUID"
         Columns::UUIDColumn
-      when "Array(String)"
-        Columns::ArrayColumn(Columns::StringColumn)
       when /^FixedString/
         Columns::FixedStringColumn
       when /^Enum8/
         Columns::Enum8Column
+      when /^Array/
+        ArrayColumn
       end
     end
   end
