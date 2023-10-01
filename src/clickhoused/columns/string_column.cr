@@ -1,7 +1,11 @@
 module Clickhoused
   module Columns
     class StringColumn < Column
-      property values : Array(String) = [] of String
+      property values : Array(String)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(String).new(rows)
+      end
 
       def rows : Int32
         values.size

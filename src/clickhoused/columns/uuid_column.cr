@@ -3,7 +3,11 @@ require "uuid"
 module Clickhoused
   module Columns
     class UUIDColumn < Column
-      property values : Array(UUID) = [] of UUID
+      property values : Array(UUID)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(UUID).new(rows)
+      end
 
       def rows : Int32
         values.size

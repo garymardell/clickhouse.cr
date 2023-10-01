@@ -5,8 +5,9 @@ module Clickhoused
     getter name : String
     getter type : String
     getter timezone : Time::Location
+    getter rows : UInt64
 
-    def initialize(@name : String, @type : String, @timezone : Time::Location)
+    def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
     end
 
     def encode(writer : Writer, revision : UInt64)
@@ -22,10 +23,6 @@ module Clickhoused
 
     abstract def encode(writer : Writer)
     abstract def decode(reader : Reader, rows : UInt64)
-
-    def rows : Int32
-      values.size
-    end
 
     def get(row : Int32)
       values[row]

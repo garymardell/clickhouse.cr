@@ -1,7 +1,11 @@
 module Clickhoused
   module Columns
     class FixedStringColumn < Column
-      property values : Array(Bytes) = [] of Bytes
+      property values : Array(Bytes)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(Bytes).new(rows)
+      end
 
       def rows : Int32
         values.size

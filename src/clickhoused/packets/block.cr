@@ -83,7 +83,7 @@ module Clickhoused
             raise "unsupported column type #{type}"
           end
 
-          column = column_class.new(name, type, timezone)
+          column = column_class.new(name, type, timezone, rows)
 
           if revision >= DBMS_MIN_REVISION_WITH_CUSTOM_SERIALIZATION
             if has_custom = reader.read_bool.not_nil!

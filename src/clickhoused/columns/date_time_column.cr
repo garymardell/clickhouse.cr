@@ -1,7 +1,11 @@
 module Clickhoused
   module Columns
     class DateTimeColumn < Column
-      property values : Array(Time) = [] of Time
+      property values : Array(Time)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(Time).new(rows)
+      end
 
       def rows : Int32
         values.size

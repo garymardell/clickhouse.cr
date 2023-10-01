@@ -1,7 +1,11 @@
 module Clickhoused
   module Columns
     class UInt32Column < Column
-      property values : Array(UInt32) = [] of UInt32
+      property values : Array(UInt32)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(UInt32).new(rows)
+      end
 
       def rows : Int32
         values.size

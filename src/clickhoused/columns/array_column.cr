@@ -3,7 +3,11 @@ require "../column"
 module Clickhoused
   module Columns
     class ArrayColumn < Column
-      getter values : Array(Column) = [] of Column
+      getter values : Array(Column)
+
+      def initialize(@name : String, @type : String, @timezone : Time::Location, @rows : UInt64 = 0)
+        @values = Array(Column).new(rows)
+      end
 
       def get(row : Int32)
         values[row].values
