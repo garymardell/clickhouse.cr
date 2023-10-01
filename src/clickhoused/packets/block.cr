@@ -70,13 +70,6 @@ module Clickhoused
           name = reader.read_string.not_nil!
           type = reader.read_string.not_nil!
 
-          # type_class = Type.for_name(type)
-
-          # unless type_class
-          #   raise "Type #{type} not supported"
-          # end
-
-          # column = Column.new(name, type_klass, timezone)
           column_class = Column.for_type(type)
 
           unless column_class
