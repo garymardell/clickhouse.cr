@@ -22,7 +22,7 @@ module Clickhoused
     end
 
     abstract def encode(writer : Writer)
-    abstract def decode(reader : Reader, rows : UInt64)
+    abstract def decode(reader : Reader)
 
     def get(row : Int32)
       values[row]

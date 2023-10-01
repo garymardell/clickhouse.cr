@@ -16,7 +16,7 @@ module Clickhoused
       def encode(writer : Writer)
       end
 
-      def decode(reader : Reader, rows : UInt64)
+      def decode(reader : Reader)
         offsets = [] of UInt64
 
         rows.times do
@@ -30,10 +30,10 @@ module Clickhoused
             0
           end
 
-          rows = offset - difference
+          nested_rows = offset - difference
 
-          wrapped_type = column_type.new(name, type, timezone, rows)
-          wrapped_type.decode(reader, rows)
+          wrapped_type = column_type.new(name, type, timezone, nested_rows)
+          wrapped_type.decode(reader)
 
           values << wrapped_type
         end

@@ -7,18 +7,10 @@ module Clickhoused
         @values = Array(Time).new(rows)
       end
 
-      def rows : Int32
-        values.size
-      end
-
-      def get(row : Int32)
-        values[row]
-      end
-
       def encode(writer : Writer)
       end
 
-      def decode(reader : Reader, rows : UInt64)
+      def decode(reader : Reader)
         rows.times do
           values << Time.unix(reader.read_sfixed32)
         end

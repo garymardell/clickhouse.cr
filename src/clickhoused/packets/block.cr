@@ -96,7 +96,7 @@ module Clickhoused
             #   column.read_state_prefix(reader)
             # end
 
-            column.decode(reader, rows)
+            column.decode(reader)
 
             names << name
             columns << column

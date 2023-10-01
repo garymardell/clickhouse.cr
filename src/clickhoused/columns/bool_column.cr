@@ -7,14 +7,10 @@ module Clickhoused
         @values = Array(Bool).new(rows)
       end
 
-      def initialize_values
-        @values = Array(Bool).new(rows)
-      end
-
       def encode(writer : Writer)
       end
 
-      def decode(reader : Reader, rows : UInt64)
+      def decode(reader : Reader)
         rows.times do
           values << reader.read_bool
         end
