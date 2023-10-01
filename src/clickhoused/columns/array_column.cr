@@ -17,9 +17,23 @@ module Clickhoused
       end
 
       def decode(reader : Reader, rows : UInt64)
+        offsets = [] of UInt64
+
         rows.times do
-          wrapped_type = column_type.new(name, type, timezone)
-          wrapped_type.decode(reader, reader.read_fixed64)
+          offsets << reader.read_fixed64
+        end
+
+        offsets.each_with_index do |offset, index|
+          difference = if index > 0
+            offsets[index - 1]
+          else
+            0
+          end
+
+          rows = offset - difference
+
+          wrapped_type = column_type.new(name, type, timezone, rows)
+          wrapped_type.decode(reader, rows)
 
           values << wrapped_type
         end

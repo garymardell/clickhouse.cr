@@ -94,15 +94,10 @@ describe Clickhoused do
       db.exec("TRUNCATE TABLE blobs")
 
       query = String.build do |io|
-        io << "INSERT INTO blobs (version) VALUES "
-
-        1.times do |i|
-          io << "("
-          io << "['hello', 'goodbye']"
-          io << ")"
-          # io << ", " unless i == 1
-        end
+        io << "INSERT INTO blobs (version) VALUES (['hellooo']) (['goodbye', 'foo', 'woo']) (['bar', 'rawr', 'another'])"
       end
+
+      # 3, 6, 7 => 1, 3, 3    # 7 - 6 = 1, 6 - 3 = 3, 3 - 0 = 3
 
       1.times do
         db.exec(query)
@@ -112,7 +107,7 @@ describe Clickhoused do
       #   db.exec("INSERT INTO blobs (version) VALUES (#{i})")
       # end
 
-      db.query("SELECT * FROM blobs ORDER BY version ASC LIMIT 100") do |rs|
+      db.query("SELECT * FROM blobs LIMIT 100") do |rs|
         rs.each do
           pp rs.read(Array(String))
         end
