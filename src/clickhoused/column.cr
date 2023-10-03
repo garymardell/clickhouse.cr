@@ -68,6 +68,8 @@ module Clickhoused
         Columns::Enum8Column
       when /^Array/
         Columns::ArrayColumn
+      when /^Nullable/
+        Columns::NullableColumn
       end
     end
   end
