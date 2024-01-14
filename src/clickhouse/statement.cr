@@ -5,7 +5,11 @@ module Clickhouse
     end
 
     protected def perform_query(args : Enumerable) : ResultSet
-      conn.connection.send_query(command, Clickhoused::QueryOptions.new)
+      query_options = Clickhoused::QueryOptions.new(
+        parameters: parameters_from_args(args)
+      )
+
+      conn.connection.send_query(command, query_options)
 
       packet = nil
       blocks = [] of Clickhoused::Packets::Data
@@ -38,6 +42,19 @@ module Clickhouse
       )
     rescue IO::Error | Clickhoused::ConnectionError
       raise DB::ConnectionLost.new(connection)
+    end
+
+    private def parameters_from_args(args)
+      parameters = [] of Clickhoused::Parameter
+
+      args.each_with_index do |arg, index|
+        parameters << Clickhoused::Parameter.new(
+          key: arg[0],
+          value: arg[1]
+        )
+      end
+
+      parameters
     end
   end
 end

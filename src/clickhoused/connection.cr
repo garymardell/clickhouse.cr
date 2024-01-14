@@ -108,7 +108,8 @@ module Clickhoused
         quota_key: "",
         compression: false,
         initial_user: "",
-        initial_address: @socket.local_address.to_s
+        initial_address: @socket.local_address.to_s,
+        parameters: options.parameters
       )
 
       query.encode(@writer, revision)

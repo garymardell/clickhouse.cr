@@ -53,6 +53,28 @@ module Clickhouse
       column.get(@block_row_index)
     end
 
+    def read(t : String.class) : String
+      value = read(String | Slice(UInt8))
+
+      case value
+      when Slice(UInt8)
+        String.new(value)
+      else
+        value
+      end
+    end
+
+    def read(t : String?.class) : String?
+      value = read(String | Slice(UInt8) | Nil)
+
+      case value
+      when Slice(UInt8)
+        String.new(value)
+      else
+        value
+      end
+    end
+
     def next_column_index : Int32
       @column_index += 1 if @column_index < column_count
       @column_index

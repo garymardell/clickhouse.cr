@@ -7,13 +7,14 @@ module Clickhouse
 
       host = context.uri.hostname || raise "no host provided"
       port = context.uri.port || 9000
+      database = context.uri.path.try &.lstrip('/') || "default"
 
       @connection = Clickhoused::Connection.new(
         host: host,
         port: port,
-        database: "default",
-        username: "default",
-        password: ""
+        database: database,
+        username: context.uri.user || "default",
+        password: context.uri.password || ""
       )
     end
 
