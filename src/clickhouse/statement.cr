@@ -50,7 +50,7 @@ module Clickhouse
       args.each_with_index do |arg, index|
         parameters << Clickhoused::Parameter.new(
           key: arg[0],
-          value: arg[1]
+          value: arg[1].to_s
         )
       end
 
