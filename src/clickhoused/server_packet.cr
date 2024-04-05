@@ -1,6 +1,6 @@
 require "./packet"
 
 module Clickhoused
-  abstract class ServerPacket < Packet
+  abstract struct ServerPacket < Packet
   end
 end

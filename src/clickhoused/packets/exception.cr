@@ -2,7 +2,7 @@ require "../server_packet"
 
 module Clickhoused
   module Packets
-    class Exception < ServerPacket
+    struct Exception < ServerPacket
       property code : UInt32
       property name : String
       property message : String

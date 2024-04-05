@@ -3,7 +3,7 @@ require "../version"
 
 module Clickhoused
   module Packets
-    class ProfileInfo < ServerPacket
+    struct ProfileInfo < ServerPacket
       property rows : UInt64
       property blocks : UInt64
       property bytes : UInt64

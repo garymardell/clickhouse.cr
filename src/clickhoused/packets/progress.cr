@@ -2,7 +2,7 @@ require "../server_packet"
 
 module Clickhoused
   module Packets
-    class Progress < ServerPacket
+    struct Progress < ServerPacket
       property rows : UInt64
       property bytes : UInt64
       property total_rows : UInt64

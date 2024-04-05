@@ -2,7 +2,7 @@ require "./block"
 
 module Clickhoused
   module Packets
-    class Extremes < Block
+    struct Extremes < Block
     end
   end
 end

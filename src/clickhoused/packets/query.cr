@@ -6,7 +6,7 @@ module Clickhoused
     OS_USER = Crystal::System::Env.get("USER")
     HOSTNAME = System.hostname
 
-    class Query < ClientPacket
+    struct Query < ClientPacket
       property id : String
       property client_name : String
       property client_version : Version

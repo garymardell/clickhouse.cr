@@ -3,7 +3,7 @@ require "../version"
 
 module Clickhoused
   module Packets
-    class Pong < ServerPacket
+    struct Pong < ServerPacket
       def initialize
       end
     end

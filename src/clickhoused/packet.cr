@@ -1,4 +1,4 @@
 module Clickhoused
-  abstract class Packet
+  abstract struct Packet
   end
 end

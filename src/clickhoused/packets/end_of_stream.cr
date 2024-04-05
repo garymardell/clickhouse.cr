@@ -2,7 +2,7 @@ require "../server_packet"
 
 module Clickhoused
   module Packets
-    class EndOfStream < ServerPacket
+    struct EndOfStream < ServerPacket
     end
   end
 end

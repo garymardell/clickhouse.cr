@@ -2,7 +2,7 @@ require "./block"
 
 module Clickhoused
   module Packets
-    class Totals < Block
+    struct Totals < Block
     end
   end
 end

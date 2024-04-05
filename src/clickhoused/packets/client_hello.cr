@@ -5,7 +5,7 @@ module Clickhoused
   module Packets
     ClientName = "Crystal Driver"
 
-    class ClientHello < ClientPacket
+    struct ClientHello < ClientPacket
       property name : String
       property version : Version
       property protocol_version : UInt64

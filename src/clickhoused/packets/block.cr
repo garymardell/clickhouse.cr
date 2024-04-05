@@ -3,7 +3,7 @@ require "../column"
 
 module Clickhoused
   module Packets
-    class Block < ServerPacket
+    abstract struct Block < ServerPacket
       property names : Array(String)
       property packet : UInt8?
       property columns : Array(Column)

@@ -3,7 +3,7 @@ require "../version"
 
 module Clickhoused
   module Packets
-    class ServerHello < ServerPacket
+    struct ServerHello < ServerPacket
       property name : String
       property display_name : String?
       property revision : UInt64

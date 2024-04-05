@@ -118,7 +118,7 @@ module Clickhoused
         send_data(table.block, table.name)
       end
 
-      send_data(Packets::Block.new, "")
+      send_data(Packets::Data.new, "")
       flush
     end
 
